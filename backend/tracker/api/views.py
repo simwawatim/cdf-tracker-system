@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.serializer.serializers import UserSerializer
+from api.serializer.serializers import UserProfileSerializer, UserSerializer
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
@@ -48,3 +48,10 @@ def user_login(request):
             'role': role,
         })
     return Response({'error': 'Invalid credentials'}, status=401)
+
+
+@api_view(['GET'])
+def get_all_users(request):
+    profiles = UserProfile.objects.select_related('user').all()
+    serializer = UserProfileSerializer(profiles, many=True)
+    return Response(serializer.data)
