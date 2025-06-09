@@ -35,14 +35,10 @@ class Project(models.Model):
     project = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     name = models.CharField(max_length=255)
-    email = models.EmailField()
-    role = models.CharField(max_length=100)
-    dept = models.CharField(max_length=100)
     progress = models.PositiveIntegerField(default=0) 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
