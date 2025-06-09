@@ -76,7 +76,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ['id', 'user', 'role', 'created_at', 'updated_at']
 
-
 class ProjectCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectCategory
@@ -87,3 +86,9 @@ class ProjectCategorySerializer(serializers.ModelSerializer):
             if isinstance(value, str):
                 attrs[key] = value.lower()
         return attrs
+
+    def validate_name(self, value):
+        value = value.lower()
+        if ProjectCategory.objects.filter(name__iexact=value).exists():
+            raise serializers.ValidationError("A category with this name already exists.")
+        return value
