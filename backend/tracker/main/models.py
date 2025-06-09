@@ -32,7 +32,6 @@ class Project(models.Model):
         ('on_hold', 'On Hold'),
     ]
 
-    project = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     name = models.CharField(max_length=255)
     progress = models.PositiveIntegerField(default=0) 

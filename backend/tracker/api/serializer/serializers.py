@@ -1,7 +1,7 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from main.models import ProjectCategory, UserProfile
+from main.models import ProjectCategory, UserProfile, Project
 import re
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -96,3 +96,7 @@ class ProjectCategorySerializer(serializers.ModelSerializer):
 
 
 
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ['id', 'name', 'description', '']
