@@ -1,7 +1,7 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from main.models import UserProfile
+from main.models import ProjectCategory, UserProfile
 import re
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -76,3 +76,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ['id', 'user', 'role', 'created_at', 'updated_at']
 
+
+class ProjectCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectCategory
+        fields = ['id', 'name', 'description']
+
+    def validate(self, attrs):
+        for key, value in attrs.items():
+            if isinstance(value, str):
+                attrs[key] = value.lower()
+        return attrs

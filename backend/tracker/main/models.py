@@ -15,3 +15,10 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+class ProjectCategory(models.Model):
+    name = models.CharField()
+    description = models.CharField()
+
+    def __str__(self):
+        self.name
