@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.serializer.serializers import UserProfileSerializer, UserSerializer, ProjectCategorySerializer
+from api.serializer.serializers import UserProfileSerializer, UserSerializer, ProjectCategorySerializer, ProjectSerializer
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
@@ -73,4 +73,12 @@ def get_project_category(request):
     serializers =ProjectCategorySerializer(project_categories, many=True)
     return Response(serializers.data, status=status.HTTP_200_OK)
     
+
+@api_view(['POST'])
+def create_project(request):
+    serializer = ProjectSerializer(data = request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message": "Project created !"}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
