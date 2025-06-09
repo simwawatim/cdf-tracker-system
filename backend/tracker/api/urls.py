@@ -6,5 +6,5 @@ urlpatterns = [
     path('api/v1/users/login/', views.user_login, name='jwt-login'),
     path('api/v1/users/all-users/', views.get_all_users, name='get_all_users'),
     path('api/v1/project-category/', views.create_project_category, name='create_project_category'),
-    
+    path('api/v1/get_project_category/', views.get_project_category, name='get_project_category'),
 ]

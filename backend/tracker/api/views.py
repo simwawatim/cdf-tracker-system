@@ -67,3 +67,10 @@ def create_project_category(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+@api_view(['GET'])
+def get_project_category(request):
+    project_categories = ProjectCategory.objects.all()
+    serializers =ProjectCategorySerializer(project_categories, many=True)
+    return Response(serializers.data, status=status.HTTP_200_OK)
+    
+
