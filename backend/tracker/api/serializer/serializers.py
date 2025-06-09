@@ -94,10 +94,15 @@ class ProjectCategorySerializer(serializers.ModelSerializer):
         return value
 
 
-
-
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ['id', 'name', 'description', 'progress', 'status', 'start_date', 'end_date']
-        
+        extra_kwargs = {
+            'name': {'required': True},
+            'description': {'required': True},
+            'progress': {'required': True},
+            'start_date': {'required': True},
+            'end_date': {'required': True},
+        }
+
