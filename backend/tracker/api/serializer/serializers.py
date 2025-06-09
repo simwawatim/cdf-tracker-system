@@ -92,3 +92,7 @@ class ProjectCategorySerializer(serializers.ModelSerializer):
         if ProjectCategory.objects.filter(name__iexact=value).exists():
             raise serializers.ValidationError("A category with this name already exists.")
         return value
+
+
+
+

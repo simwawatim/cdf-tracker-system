@@ -22,3 +22,29 @@ class ProjectCategory(models.Model):
 
     def __str__(self):
         self.name
+
+
+class Project(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('active', 'Active'),
+        ('completed', 'Completed'),
+        ('on_hold', 'On Hold'),
+    ]
+
+    project = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    role = models.CharField(max_length=100)
+    dept = models.CharField(max_length=100)
+    progress = models.PositiveIntegerField(default=0) 
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.project}"
