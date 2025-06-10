@@ -106,3 +106,8 @@ class ProjectSerializer(serializers.ModelSerializer):
             'end_date': {'required': True},
         }
 
+
+class ProjectsListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = "__all__"

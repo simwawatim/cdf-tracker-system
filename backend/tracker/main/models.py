@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import SET_NULL
 from django.contrib.auth.models import User
 
 
@@ -31,7 +32,7 @@ class Project(models.Model):
         ('completed', 'Completed'),
         ('on_hold', 'On Hold'),
     ]
-
+    category = models.ForeignKey(ProjectCategory, on_delete=SET_NULL, null=True)
     description = models.TextField(blank=True)
     name = models.CharField(max_length=255)
     progress = models.PositiveIntegerField(default=0) 
