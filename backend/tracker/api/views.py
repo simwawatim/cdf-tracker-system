@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.serializer.serializers import ProjectGetCategoryName, ProjectsListSerializer, UserProfileSerializer, UserSerializer, ProjectCategorySerializer, ProjectSerializer
+from api.serializer.serializers import ProjectGetCategoryName, ProjectStatusSerializer, ProjectsListSerializer, UserProfileSerializer, UserSerializer, ProjectCategorySerializer, ProjectSerializer
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
@@ -95,3 +95,28 @@ def get_category_by_name(request):
     category_name = ProjectCategory.objects.all()
     serializers = ProjectGetCategoryName(category_name, many=True)
     return Response(serializers.data, status=status.HTTP_200_OK)
+
+@api_view(['PATCH'])
+@permission_classes([AllowAny])
+def update_project_status(request, pk):
+    try:
+        project = Project.objects.get(pk=pk)
+    except Project.DoesNotExist:
+        return Response({"detail": "Project not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = ProjectStatusSerializer(project, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_project_by_id(request, pk):
+    try:
+        project = Project.objects.get(pk=pk)
+    except Project.DoesNotExist:
+        return Response({"detail": "Project not found."}, status=status.HTTP_404_NOT_FOUND)
+    serializer = ProjectSerializer(project)
+    return Response(serializer.data)
