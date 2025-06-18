@@ -9,4 +9,5 @@ urlpatterns = [
     path('api/v1/get-project-category/', views.get_project_category, name='get_project_category'),
     path('api/v1/create-project/', views.create_project, name='create_project'),
     path('api/v1/get-all-project/', views.get_all_projects, name='get_all_projects'),
+    path('api/v1/get_category_by_name/', views.get_category_by_name, name='get_category_by_name'),
 ]

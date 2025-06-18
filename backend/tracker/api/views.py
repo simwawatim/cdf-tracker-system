@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.serializer.serializers import ProjectsListSerializer, UserProfileSerializer, UserSerializer, ProjectCategorySerializer, ProjectSerializer
+from api.serializer.serializers import ProjectGetCategoryName, ProjectsListSerializer, UserProfileSerializer, UserSerializer, ProjectCategorySerializer, ProjectSerializer
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
@@ -88,3 +88,10 @@ def get_all_projects(request):
     all_projects = Project.objects.all()
     serializer = ProjectsListSerializer(all_projects, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_category_by_name(request):
+    category_name = ProjectCategory.objects.all()
+    serializers = ProjectGetCategoryName(category_name, many=True)
+    return Response(serializers.data, status=status.HTTP_200_OK)

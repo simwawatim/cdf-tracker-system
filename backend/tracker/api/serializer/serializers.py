@@ -97,17 +97,42 @@ class ProjectCategorySerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ['id', 'name', 'description', 'progress', 'status', 'start_date', 'end_date']
+        fields = ['id', 'name', 'description', 'progress', 'status', 'start_date', 'end_date', 'category']
         extra_kwargs = {
             'name': {'required': True},
             'description': {'required': True},
             'progress': {'required': True},
             'start_date': {'required': True},
             'end_date': {'required': True},
+            'category': {'required': True},
         }
+
+    def validate_category(self, value):
+        if not ProjectCategory.objects.filter(id=value).exists():
+            raise serializers.ValidationError("This category does not exist.")
+        return value
+
+    # def validate_progress(self, value):
+    #     if not (0 <= value <= 100):
+    #         raise serializers.ValidationError("Progress must be between 0 and 100.")
+    #     return value
+
+    def validate(self, attrs):
+        start = attrs.get('start_date')
+        end = attrs.get('end_date')
+        if start and end and start > end:
+            raise serializers.ValidationError("End date must be after start date.")
+        return attrs
+
 
 
 class ProjectsListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = "__all__"
+
+
+class ProjectGetCategoryName(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ['name']
