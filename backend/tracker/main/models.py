@@ -1,6 +1,9 @@
+import os
 from django.db import models
 from django.db.models import SET_NULL
 from django.contrib.auth.models import User
+
+from tracker import settings
 
 
 class UserProfile(models.Model):
@@ -46,17 +49,6 @@ class Project(models.Model):
         return f"{self.name} - {self.project}"
 
 
-from django.db import models
-
-
-# Optional: Project model, assumed to exist already
-class Project(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
 
 class ProjectStatusUpdate(models.Model):
     STATUS_CHOICES = [
@@ -82,6 +74,8 @@ class ProjectStatusUpdate(models.Model):
 
 
 def upload_to(instance, filename):
+    folder_path = os.path.join(settings.MEDIA_ROOT, f'supporting_documents/project_{instance.status_update.project.id}')
+    os.makedirs(folder_path, exist_ok=True)  
     return f'supporting_documents/project_{instance.status_update.project.id}/{filename}'
 
 

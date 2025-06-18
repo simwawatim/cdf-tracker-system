@@ -12,4 +12,5 @@ urlpatterns = [
     path('api/v1/get_category_by_name/', views.get_category_by_name, name='get_category_by_name'),
     path('api/v1/projects/<int:pk>/update-status/', views.update_project_status, name='update_project_status'),
     path('api/v1/projects/<int:pk>/', views.get_project_by_id, name='get_project_by_id'),
+    path('api/v1/status-updates/', views.create_project_status_update, name='status-update-create'),
 ]

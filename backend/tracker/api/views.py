@@ -1,16 +1,18 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.serializer.serializers import ProjectGetCategoryName, ProjectStatusSerializer, ProjectsListSerializer, UserProfileSerializer, UserSerializer, ProjectCategorySerializer, ProjectSerializer
+from api.serializer.serializers import ProjectGetCategoryName, ProjectStatusSerializer, ProjectStatusUpdateSerializer, ProjectsListSerializer, UserProfileSerializer, UserSerializer, ProjectCategorySerializer, ProjectSerializer
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework.response import Response
-from main.models import Project, UserProfile
+from main.models import Project, SupportingDocument, UserProfile
 from django.shortcuts import render
 from rest_framework import status
 from main.models import ProjectCategory
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 @api_view(['POST'])
@@ -120,3 +122,19 @@ def get_project_by_id(request, pk):
         return Response({"detail": "Project not found."}, status=status.HTTP_404_NOT_FOUND)
     serializer = ProjectSerializer(project)
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser])
+def create_project_status_update(request):
+    serializer = ProjectStatusUpdateSerializer(data=request.data)
+    if serializer.is_valid():
+        status_update = serializer.save()
+        files = request.FILES.getlist('supporting_files')
+
+        for file_obj in files:
+            SupportingDocument.objects.create(status_update=status_update, file=file_obj)
+
+        return Response(ProjectStatusUpdateSerializer(status_update).data, status=status.HTTP_201_CREATED)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

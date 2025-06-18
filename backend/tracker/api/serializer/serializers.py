@@ -1,7 +1,7 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from main.models import ProjectCategory, UserProfile, Project
+from main.models import ProjectCategory, ProjectStatusUpdate, SupportingDocument, UserProfile, Project
 import re
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -142,3 +142,24 @@ class ProjectStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ['id', 'status']
+
+
+
+
+class SupportingDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SupportingDocument
+        fields = ['id', 'file', 'uploaded_at']
+
+
+class SupportingDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SupportingDocument
+        fields = ['id', 'file', 'uploaded_at']
+
+class ProjectStatusUpdateSerializer(serializers.ModelSerializer):
+    documents = SupportingDocumentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ProjectStatusUpdate
+        fields = ['id', 'project', 'status', 'action_message', 'file_type', 'created_at', 'documents']
