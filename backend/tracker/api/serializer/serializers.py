@@ -98,12 +98,14 @@ class ProjectCategorySerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(queryset=ProjectCategory.objects.all())
+    category_name = serializers.CharField(source='category.name', read_only=True)
+    create_by = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = Project
         fields = [
             'id', 'name', 'description', 'progress', 'status',
-            'start_date', 'end_date', 'category', 'create_by'
+            'start_date', 'end_date', 'category', 'category_name', 'create_by'
         ]
         extra_kwargs = {
             'name': {'required': True},
@@ -112,7 +114,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             'start_date': {'required': True},
             'end_date': {'required': True},
             'category': {'required': True},
-            'create_by': {'required': False, 'read_only': True} 
         }
 
     def validate(self, attrs):
@@ -125,10 +126,16 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class ProjectsListSerializer(serializers.ModelSerializer):
+    category = ProjectCategorySerializer(read_only=True)
+    create_by = UserSerializer(read_only=True) 
+
     class Meta:
         model = Project
-        fields = "__all__"
-
+        fields = [
+            'id', 'name', 'description', 'progress', 'status',
+            'start_date', 'end_date', 'created_at', 'updated_at',
+            'category', 'create_by'
+        ]
 
 class ProjectGetCategoryName(serializers.ModelSerializer):
     class Meta:
