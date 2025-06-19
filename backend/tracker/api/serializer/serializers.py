@@ -95,12 +95,16 @@ class ProjectCategorySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("A category with this name already exists.")
         return value
     
+
 class ProjectSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(queryset=ProjectCategory.objects.all())
 
     class Meta:
         model = Project
-        fields = ['id', 'name', 'description', 'progress', 'status', 'start_date', 'end_date', 'category']
+        fields = [
+            'id', 'name', 'description', 'progress', 'status',
+            'start_date', 'end_date', 'category', 'create_by'
+        ]
         extra_kwargs = {
             'name': {'required': True},
             'description': {'required': True},
@@ -108,6 +112,7 @@ class ProjectSerializer(serializers.ModelSerializer):
             'start_date': {'required': True},
             'end_date': {'required': True},
             'category': {'required': True},
+            'create_by': {'required': False, 'read_only': True} 
         }
 
     def validate(self, attrs):

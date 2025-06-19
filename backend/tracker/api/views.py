@@ -113,12 +113,11 @@ def get_project_category(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_project(request):
-    serializer = ProjectSerializer(data = request.data)
+    serializer = ProjectSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
-        serializer.save()
-        return Response({"message": "Project created !"}, status=status.HTTP_201_CREATED)
+        serializer.save(create_by=request.user)
+        return Response({"message": "Project created!"}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
