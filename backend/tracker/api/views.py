@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.tokens import RefreshToken
 from api.serializer.serializers import ProjectGetCategoryName, ProjectStatusSerializer, ProjectStatusUpdateSerializer, ProjectViewSerializer, ProjectsListSerializer, UserProfileSerializer, UserSerializer, ProjectCategorySerializer, ProjectSerializer
 from django.contrib.auth.models import User
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
@@ -84,13 +84,14 @@ def user_login(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_all_users(request):
     profiles = UserProfile.objects.select_related('user').all()
     serializer = UserProfileSerializer(profiles, many=True)
     return Response(serializer.data)
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def create_project_category(request):
     serializer = ProjectCategorySerializer(data = request.data)
     if serializer.is_valid():
@@ -100,6 +101,7 @@ def create_project_category(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_project_category(request):
     project_categories = ProjectCategory.objects.all()
     serializers =ProjectCategorySerializer(project_categories, many=True)
@@ -107,6 +109,7 @@ def get_project_category(request):
     
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_project(request):
     serializer = ProjectSerializer(data = request.data)
     if serializer.is_valid():
@@ -116,6 +119,7 @@ def create_project(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_all_projects(request):
     all_projects = Project.objects.all()
     serializer = ProjectsListSerializer(all_projects, many=True)
@@ -123,13 +127,14 @@ def get_all_projects(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_category_by_name(request):
     category_name = ProjectCategory.objects.all()
     serializers = ProjectGetCategoryName(category_name, many=True)
     return Response(serializers.data, status=status.HTTP_200_OK)
 
 @api_view(['PATCH'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def update_project_status(request, pk):
     try:
         project = Project.objects.get(pk=pk)
@@ -144,7 +149,7 @@ def update_project_status(request, pk):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def get_project_by_id(request, pk):
     try:
         project = Project.objects.get(pk=pk)
@@ -156,6 +161,7 @@ def get_project_by_id(request, pk):
 
     
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
 def create_project_status_update(request):
     project_id = request.data.get("project")
