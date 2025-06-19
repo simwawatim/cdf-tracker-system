@@ -140,7 +140,9 @@ def create_project_status_update(request):
     serializer = ProjectStatusUpdateSerializer(data=request.data)
 
     if serializer.is_valid():
-        status_update = serializer.save(project=project) 
+        status_update = serializer.save(project=project)
+        project.status = status_update.status
+        project.save(update_fields=['status'])
 
         files = request.FILES.getlist('supporting_files')
         for file_obj in files:
