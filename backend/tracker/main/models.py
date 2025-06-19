@@ -2,7 +2,6 @@ import os
 from django.db import models
 from django.db.models import SET_NULL
 from django.contrib.auth.models import User
-
 from tracker import settings
 
 
@@ -19,6 +18,7 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+    
     
 class ProjectCategory(models.Model):
     name = models.CharField()

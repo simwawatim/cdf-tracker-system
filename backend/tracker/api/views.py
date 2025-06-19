@@ -19,9 +19,12 @@ from rest_framework.parsers import MultiPartParser, FormParser
 def create_user(request):
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
-        return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
+        user = serializer.save()
+        role = request.data.get('role', 'user') 
+        UserProfile.objects.create(user=user, role=role)
+        return Response({"message": "User and profile created successfully"}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
