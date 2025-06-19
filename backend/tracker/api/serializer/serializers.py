@@ -126,7 +126,7 @@ class ProjectsListSerializer(serializers.ModelSerializer):
 class ProjectGetCategoryName(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ['name']
+        fields = ['id', 'name']
 
 
 class ProjectStatusSerializer(serializers.ModelSerializer):
