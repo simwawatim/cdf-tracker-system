@@ -92,9 +92,10 @@ class ProjectCategorySerializer(serializers.ModelSerializer):
         if ProjectCategory.objects.filter(name__iexact=value).exists():
             raise serializers.ValidationError("A category with this name already exists.")
         return value
-
-
+    
 class ProjectSerializer(serializers.ModelSerializer):
+    category = serializers.PrimaryKeyRelatedField(queryset=ProjectCategory.objects.all())
+
     class Meta:
         model = Project
         fields = ['id', 'name', 'description', 'progress', 'status', 'start_date', 'end_date', 'category']
@@ -106,16 +107,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             'end_date': {'required': True},
             'category': {'required': True},
         }
-
-    def validate_category(self, value):
-        if not ProjectCategory.objects.filter(id=value).exists():
-            raise serializers.ValidationError("This category does not exist.")
-        return value
-
-    # def validate_progress(self, value):
-    #     if not (0 <= value <= 100):
-    #         raise serializers.ValidationError("Progress must be between 0 and 100.")
-    #     return value
 
     def validate(self, attrs):
         start = attrs.get('start_date')
@@ -144,14 +135,6 @@ class ProjectStatusSerializer(serializers.ModelSerializer):
         fields = ['id', 'status']
 
 
-
-
-class SupportingDocumentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SupportingDocument
-        fields = ['id', 'file', 'uploaded_at']
-
-
 class SupportingDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = SupportingDocument
@@ -163,3 +146,17 @@ class ProjectStatusUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectStatusUpdate
         fields = ['id', 'project', 'status', 'action_message', 'file_type', 'created_at', 'documents']
+
+
+
+
+class ProjectViewSerializer(serializers.ModelSerializer):
+    category = serializers.StringRelatedField()  
+    status_updates = ProjectStatusUpdateSerializer(many=True, read_only=True)  
+
+    class Meta:
+        model = Project
+        fields = [
+            'id', 'name', 'description', 'progress', 'status', 'start_date', 'end_date',
+            'created_at', 'updated_at', 'category', 'status_updates'
+        ]

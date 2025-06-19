@@ -25,8 +25,7 @@ class ProjectCategory(models.Model):
     description = models.CharField()
 
     def __str__(self):
-        self.name
-
+        return self.name or "Unnamed Category" 
 
 class Project(models.Model):
     STATUS_CHOICES = [
@@ -46,7 +45,9 @@ class Project(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.name} - {self.project}"
+        return self.name or "Unnamed Category" 
+
+
 
 
 

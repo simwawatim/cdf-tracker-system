@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.serializer.serializers import ProjectGetCategoryName, ProjectStatusSerializer, ProjectStatusUpdateSerializer, ProjectsListSerializer, UserProfileSerializer, UserSerializer, ProjectCategorySerializer, ProjectSerializer
+from api.serializer.serializers import ProjectGetCategoryName, ProjectStatusSerializer, ProjectStatusUpdateSerializer, ProjectViewSerializer, ProjectsListSerializer, UserProfileSerializer, UserSerializer, ProjectCategorySerializer, ProjectSerializer
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework.response import Response
 from main.models import Project, SupportingDocument, UserProfile
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from rest_framework import status
 from main.models import ProjectCategory
 from rest_framework.decorators import api_view, parser_classes
@@ -120,18 +120,26 @@ def get_project_by_id(request, pk):
         project = Project.objects.get(pk=pk)
     except Project.DoesNotExist:
         return Response({"detail": "Project not found."}, status=status.HTTP_404_NOT_FOUND)
-    serializer = ProjectSerializer(project)
-    return Response(serializer.data)
 
+    serializer = ProjectViewSerializer(project)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
+    
 @api_view(['POST'])
 @parser_classes([MultiPartParser, FormParser])
 def create_project_status_update(request):
-    serializer = ProjectStatusUpdateSerializer(data=request.data)
-    if serializer.is_valid():
-        status_update = serializer.save()
-        files = request.FILES.getlist('supporting_files')
+    project_id = request.data.get("project")
 
+    if not project_id:
+        return Response({"error": "Project ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    project = get_object_or_404(Project, pk=project_id)
+    serializer = ProjectStatusUpdateSerializer(data=request.data)
+
+    if serializer.is_valid():
+        status_update = serializer.save(project=project) 
+
+        files = request.FILES.getlist('supporting_files')
         for file_obj in files:
             SupportingDocument.objects.create(status_update=status_update, file=file_obj)
 
