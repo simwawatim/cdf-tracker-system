@@ -13,16 +13,43 @@ from rest_framework import status
 from main.models import ProjectCategory
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
-
+from django.core.mail import send_mail
+from django.conf import settings
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 
 @api_view(['POST'])
 def create_user(request):
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
-        role = request.data.get('role', 'user') 
+        password = request.data.get('password')
+        if password:
+            user.set_password(password)
+            user.save()
+
+        role = request.data.get('role', 'user')
         UserProfile.objects.create(user=user, role=role)
+
+        subject = 'Your Account Has Been Created'
+        message = f"""
+        Hello {user.username},
+
+        Your account has been successfully created.
+
+        Username: {user.username}
+        Email: {user.email}
+        Password: {password}
+        Role: {role}
+
+        Please keep this information secure.
+        """
+        recipient_list = [user.email]
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list, fail_silently=False)
+
         return Response({"message": "User and profile created successfully"}, status=status.HTTP_201_CREATED)
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
