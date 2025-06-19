@@ -86,6 +86,8 @@ def user_login(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_users(request):
+    user = request.user 
+    print(f"Request made by: {user.username}")
     profiles = UserProfile.objects.select_related('user').all()
     serializer = UserProfileSerializer(profiles, many=True)
     return Response(serializer.data)
