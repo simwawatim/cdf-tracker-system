@@ -157,10 +157,11 @@ class SupportingDocumentSerializer(serializers.ModelSerializer):
 
 class ProjectStatusUpdateSerializer(serializers.ModelSerializer):
     documents = SupportingDocumentSerializer(many=True, read_only=True)
+    create_by = UserSerializer(read_only=True) 
 
     class Meta:
         model = ProjectStatusUpdate
-        fields = ['id', 'project', 'status', 'action_message', 'file_type', 'created_at', 'documents']
+        fields = ['id', 'project', 'status', 'action_message', 'file_type', 'created_at', 'documents', 'create_by']
 
 
 
