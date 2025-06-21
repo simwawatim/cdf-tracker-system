@@ -70,6 +70,7 @@ class ProjectStatusUpdate(models.Model):
     action_message = models.TextField(blank=True, null=True)
     file_type = models.CharField(max_length=50, choices=FILE_TYPE_CHOICES, default='application/pdf')
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='update_project')
 
     def __str__(self):
         return f"{self.project.name} - {self.get_status_display()} ({self.created_at.date()})"
