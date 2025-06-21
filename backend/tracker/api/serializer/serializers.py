@@ -157,11 +157,11 @@ class SupportingDocumentSerializer(serializers.ModelSerializer):
 
 class ProjectStatusUpdateSerializer(serializers.ModelSerializer):
     documents = SupportingDocumentSerializer(many=True, read_only=True)
-    create_by = UserSerializer(read_only=True) 
+    updated_by = UserSerializer(read_only=True) 
 
     class Meta:
         model = ProjectStatusUpdate
-        fields = ['id', 'project', 'status', 'action_message', 'file_type', 'created_at', 'documents', 'create_by']
+        fields = ['id', 'project', 'status', 'action_message', 'file_type', 'created_at', 'documents', 'updated_by']
 
 
 
@@ -169,10 +169,11 @@ class ProjectStatusUpdateSerializer(serializers.ModelSerializer):
 class ProjectViewSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField()  
     status_updates = ProjectStatusUpdateSerializer(many=True, read_only=True)  
+    updated_by = UserSerializer(read_only=True) 
 
     class Meta:
         model = Project
         fields = [
             'id', 'name', 'description', 'progress', 'status', 'start_date', 'end_date',
-            'created_at', 'updated_at', 'category', 'status_updates'
+            'created_at', 'updated_at', 'category', 'status_updates', 'updated_by'
         ]
