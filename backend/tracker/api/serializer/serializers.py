@@ -137,6 +137,7 @@ class ProjectsListSerializer(serializers.ModelSerializer):
             'category', 'create_by'
         ]
 
+
 class ProjectGetCategoryName(serializers.ModelSerializer):
     class Meta:
         model = Project

@@ -125,7 +125,7 @@ def get_all_projects(request):
     all_projects = Project.objects.all()
     serializer = ProjectsListSerializer(all_projects, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
-
+5
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
