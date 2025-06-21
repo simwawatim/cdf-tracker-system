@@ -177,3 +177,8 @@ class ProjectViewSerializer(serializers.ModelSerializer):
             'id', 'name', 'description', 'progress', 'status', 'start_date', 'end_date',
             'created_at', 'updated_at', 'category', 'status_updates', 'updated_by'
         ]
+
+class MonthlyProjectProgressSerializer(serializers.Serializer):
+    month = serializers.CharField()
+    avg_progress = serializers.FloatField()
+    project_count = serializers.IntegerField()

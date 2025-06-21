@@ -1,6 +1,7 @@
+import datetime
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.serializer.serializers import ProjectGetCategoryName, ProjectStatusSerializer, ProjectStatusUpdateSerializer, ProjectViewSerializer, ProjectsListSerializer, UserProfileSerializer, UserSerializer, ProjectCategorySerializer, ProjectSerializer
+from api.serializer.serializers import MonthlyProjectProgressSerializer, ProjectGetCategoryName, ProjectStatusSerializer, ProjectStatusUpdateSerializer, ProjectViewSerializer, ProjectsListSerializer, UserProfileSerializer, UserSerializer, ProjectCategorySerializer, ProjectSerializer
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view
@@ -18,6 +19,9 @@ from django.conf import settings
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Avg, Count
+from django.db.models.functions import ExtractMonth
+from datetime import datetime
 
 @api_view(['POST'])
 def create_user(request):
@@ -46,6 +50,7 @@ def create_user(request):
         Please keep this information secure.
         """
         recipient_list = [user.email]
+        
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list, fail_silently=False)
 
         return Response({"message": "User and profile created successfully"}, status=status.HTTP_201_CREATED)
@@ -120,7 +125,7 @@ def create_project(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def get_all_projects(request):
     all_projects = Project.objects.all()
     serializer = ProjectsListSerializer(all_projects, many=True)
@@ -185,3 +190,40 @@ def create_project_status_update(request):
         return Response(ProjectStatusUpdateSerializer(status_update).data, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def project_progress_by_month(request):
+    current_year = datetime.now().year
+
+    projects = (
+        Project.objects
+        .filter(start_date__year=current_year)
+        .annotate(month_num=ExtractMonth('start_date'))
+        .values('month_num')
+        .annotate(
+            avg_progress=Avg('progress'),
+            project_count=Count('id')
+        )
+        .order_by('month_num')
+    )
+
+    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+    # Build a full list of months with default values
+    response_data = []
+    month_data_map = {p['month_num']: p for p in projects}
+
+    for month_index in range(1, 13):
+        month_name = months[month_index - 1]
+        month_data = month_data_map.get(month_index, None)
+        response_data.append({
+            "month": month_name,
+            "avg_progress": round(month_data['avg_progress'], 2) if month_data else 0,
+            "project_count": month_data['project_count'] if month_data else 0,
+        })
+
+    serializer = MonthlyProjectProgressSerializer(response_data, many=True)
+    return Response(serializer.data)
