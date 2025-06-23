@@ -227,3 +227,26 @@ def project_progress_by_month(request):
 
     serializer = MonthlyProjectProgressSerializer(response_data, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def get_project_based_on_category(request, category_name, id):
+    try:
+        category = ProjectCategory.objects.get(name=category_name)
+    except ProjectCategory.DoesNotExist:
+        return Response({"detail": "Category not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    projects = Project.objects.filter(category=category)
+    serializer = ProjectsListSerializer(projects, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_projects_by_category(request, id):
+    try:
+        category = ProjectCategory.objects.get(id=id)
+    except ProjectCategory.DoesNotExist:
+        return Response({"detail": "Category not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    projects = Project.objects.filter(category=category)
+    serializer = ProjectsListSerializer(projects, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)

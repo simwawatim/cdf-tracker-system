@@ -14,4 +14,5 @@ urlpatterns = [
     path('api/v1/projects/<int:pk>/', views.get_project_by_id, name='get_project_by_id'),
     path('api/v1/status-updates/', views.create_project_status_update, name='status-update-create'),
     path('api/v1/project-progress/', views.project_progress_by_month, name='project_progress_by_month'),
+    path('api/v1/projects-based-on-category/<int:id>/', views.get_projects_by_category),
 ]
