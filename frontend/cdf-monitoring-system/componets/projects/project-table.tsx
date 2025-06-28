@@ -22,7 +22,7 @@ interface Project {
   name: string;
   description: string;
   progress: number;
-  status: "pending" | "active" | "completed" | "delayed";
+  status: "pending" | "active" | "completed" | "on_hold";
   startDate: string;
   endDate: string;
   img: string;
@@ -44,9 +44,16 @@ const ProjectTable = () => {
     endDate: "",
   });
 
- const fetchProjects = async (categoryList: ProjectCategoryByName[]) => {
+  const fetchProjects = async () => {
     try {
-      const projectData = await getAllProjects();
+      const response: any = await getAllProjects();
+      const projectData = Array.isArray(response) ? response : response.projects;
+
+      if (!Array.isArray(projectData)) {
+        console.error("Expected 'projects' to be an array. Got:", projectData);
+        return;
+      }
+
       const formattedProjects: Project[] = projectData.map((project: any) => ({
         id: project.id,
         name: project.name,
@@ -56,7 +63,7 @@ const ProjectTable = () => {
         startDate: project.start_date,
         endDate: project.end_date,
         img: project.img || "",
-        category: project.category?.name || "Uncategorized", 
+        category: project.category?.name || "Uncategorized",
         created_by: {
           id: project.create_by?.id || 0,
           username: project.create_by?.username || "Unknown",
@@ -65,29 +72,26 @@ const ProjectTable = () => {
           dept: project.create_by?.dept || "N/A",
         },
       }));
-      console.log("Formatted Projects:", formattedProjects);
+
       setProjects(formattedProjects);
     } catch (error) {
       console.error("Failed to fetch projects:", error);
     }
   };
+
   const fetchCategoriesAndProjects = async () => {
     try {
       const data = await fetchProjectCategoryByName();
-      try{
-         setCategories(data);
-          if (data && data.length > 0) {
-            setFormData((prev) => ({ 
-              ...prev, 
-              category: data[0]?.id?.toString() || "" 
-            }));
-          }
-          await fetchProjects(data);
+      setCategories(data);
+
+      if (data?.length > 0) {
+        setFormData((prev) => ({
+          ...prev,
+          category: data[0]?.id?.toString() || "",
+        }));
       }
-      catch (error) {
-        console.error("Error setting categories:", error);
-      }
-     
+
+      await fetchProjects();
     } catch (error) {
       console.error("Error fetching categories or projects:", error);
     }
@@ -104,52 +108,45 @@ const ProjectTable = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setErrors({});
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors({});
 
-  if (!formData.category) {
-    alert("Please select a category");
-    return;
-  }
-
-  console.log("Category selected:", formData.category);
-  const categoryId = parseInt(formData.category);
-
-  if (isNaN(categoryId)) {
-    alert("Invalid category selected");
-    return;
-  }
-
-  try {
-    const payload = {
-      id: 0,
-      name: formData.name,
-      description: formData.description,
-      progress: 0,
-      start_date: formData.startDate,
-      end_date: formData.endDate,
-      category: categoryId,
-    };
-
-    await createProject(payload);
-    setIsModalOpen(false);
-    setFormData({
-      name: "",
-      description: "",
-      category: categories[0]?.id?.toString() || "",
-      startDate: "",
-      endDate: "",
-    });
-    await fetchProjects(categories);
-  } catch (error: any) {
-    if (error.response?.data) {
-      setErrors(error.response.data);
-    } else {
-      console.error("Unexpected error:", error);
+    const categoryId = parseInt(formData.category);
+    if (!categoryId || isNaN(categoryId)) {
+      alert("Please select a valid category");
+      return;
     }
-  }
-};
+
+    try {
+      const payload = {
+        id: 0,
+        name: formData.name,
+        description: formData.description,
+        progress: 0,
+        start_date: formData.startDate,
+        end_date: formData.endDate,
+        category: categoryId,
+      };
+
+      await createProject(payload);
+      setIsModalOpen(false);
+      setFormData({
+        name: "",
+        description: "",
+        category: categories[0]?.id?.toString() || "",
+        startDate: "",
+        endDate: "",
+      });
+      await fetchProjects();
+    } catch (error: any) {
+      if (error.response?.data) {
+        setErrors(error.response.data);
+      } else {
+        console.error("Unexpected error:", error);
+      }
+    }
+  };
 
 
   return (
