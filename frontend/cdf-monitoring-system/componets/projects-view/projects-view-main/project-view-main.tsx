@@ -10,7 +10,7 @@ const ProjectViewMain = () => {
 
         </SideNav>
       {/* Main content: 2/3 width */}
-      <main className="w-2/3 p-12 overflow-y-auto flex flex-col">
+      <main className="w-2/2 p-12 overflow-y-auto flex flex-col">
         <ProjectDetail/>
       </main>
     </div>
